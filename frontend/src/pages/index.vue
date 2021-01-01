@@ -45,14 +45,29 @@ export default {
   },
   name: "home",
   created() {
-    this.$axios
-      .get("http://127.0.0.1:8080/api/v1/cainfo")
-      .then((res) => {
-        this.cainfo = res.result;
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+    this.getCAInfo();
+  },
+  methods: {
+    getCAInfo() {
+      this.$axios
+        .get("/api/v1/cainfo")
+        .then((res) => {
+          this.cainfo = res.result;
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    },
+    getIdentities() {
+      this.$axios
+        .get("/api/v1/identities")
+        .then((res) => {
+          console.log(res);
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    },
   },
 };
 </script>
