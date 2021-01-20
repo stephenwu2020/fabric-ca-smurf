@@ -1,0 +1,7 @@
+server:
+  port: 5050
+
+caserver:
+  addr: http://localhost
+  port: 7054
+  homedir: /tmp/smurf/client
