@@ -10,15 +10,23 @@ import (
 )
 
 type CaClient struct {
+	ServerAddr string
+	ServerPort int
+	HomeDir    string
 }
 
-func GetCAInfo() (*lib.GetCAInfoResponse, error) {
-	serverAddr := Configer.GetString("caserver.addr")
-	serverPort := Configer.GetInt("caserver.port")
-	homeDir := Configer.GetString("caserver.homedir")
+func NewCaClient() *CaClient {
+	return &CaClient{
+		ServerAddr: Configer.GetString("caserver.addr"),
+		ServerPort: Configer.GetInt("caserver.port"),
+		HomeDir:    Configer.GetString("caserver.homedir"),
+	}
+}
+
+func (c *CaClient) GetCAInfo() (*lib.GetCAInfoResponse, error) {
 	client := lib.Client{
-		Config:  &lib.ClientConfig{URL: fmt.Sprintf("%s:%d", serverAddr, serverPort)},
-		HomeDir: homeDir,
+		Config:  &lib.ClientConfig{URL: fmt.Sprintf("%s:%d", c.ServerAddr, c.ServerPort)},
+		HomeDir: c.HomeDir,
 	}
 	cainfo, err := client.GetCAInfo(&api.GetCAInfoRequest{})
 	return cainfo, err
