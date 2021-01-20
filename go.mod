@@ -12,6 +12,7 @@ require (
 	github.com/Knetic/govaluate v3.0.0+incompatible // indirect
 	github.com/VividCortex/gohistogram v1.0.0 // indirect
 	github.com/cloudflare/cfssl v0.0.0-20170916000929-7d88da830aad // indirect
+	github.com/gin-gonic/gin v1.6.3
 	github.com/google/certificate-transparency-go v1.0.21 // indirect
 	github.com/gorilla/handlers v1.5.1 // indirect
 	github.com/gorilla/mux v1.8.0 // indirect
