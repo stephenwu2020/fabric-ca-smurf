@@ -1,52 +1,84 @@
 package casdk
 
 import (
-	"fmt"
-
+	"bytes"
 	. "fabric-ca-smurf/config"
-
-	"github.com/cloudflare/cfssl/log"
-	"github.com/hyperledger/fabric-ca/api"
-	"github.com/hyperledger/fabric-ca/lib"
+	. "fabric-ca-smurf/logger"
+	"fmt"
+	"os"
+	"os/exec"
+	"path"
 )
 
 type CaSdk struct {
-	ServerAddr string
-	ServerPort int
-	HomeDir    string
-	CaClient   *lib.Client
+	ServerAddr  string
+	ServerPort  int
+	HomeDir     string
+	CommandName string
+	CommandPath string
+	Admin       string
+	Adminpw     string
 }
 
 func NewCaSdk() *CaSdk {
 	addr := Configer.GetString("caserver.addr")
 	port := Configer.GetInt("caserver.port")
 	dir := Configer.GetString("caserver.homedir")
-	client := lib.Client{
-		Config:  &lib.ClientConfig{URL: fmt.Sprintf("%s:%d", addr, port)},
-		HomeDir: dir,
-	}
+	admin := Configer.GetString("caserver.admin")
+	adminpw := Configer.GetString("caserver.adminpw")
+	pwd, _ := os.Getwd()
+	cliPath := path.Join(pwd, "caclient", "fabric-ca-client")
+	MyLogger.Info(cliPath)
+
 	return &CaSdk{
-		ServerAddr: addr,
-		ServerPort: port,
-		HomeDir:    dir,
-		CaClient:   &client,
+		ServerAddr:  addr,
+		ServerPort:  port,
+		HomeDir:     dir,
+		CommandPath: cliPath,
+		Admin:       admin,
+		Adminpw:     adminpw,
 	}
 }
 
-func (c *CaSdk) Init() error {
-	return c.CaClient.Init()
+func (c *CaSdk) Help() (string, error) {
+	cmd := exec.Command(c.CommandName)
+	var out bytes.Buffer
+	cmd.Stdout = &out
+	cmd.Path = c.CommandPath
+
+	if err := cmd.Run(); err != nil {
+		return "", err
+	}
+	return out.String(), nil
 }
 
-func (c *CaSdk) GetCAInfo() (*lib.GetCAInfoResponse, error) {
-	cainfo, err := c.CaClient.GetCAInfo(&api.GetCAInfoRequest{})
-	return cainfo, err
+func (c *CaSdk) GetCAInfo() (string, error) {
+	cainfoDir := Configer.GetString("caclient.cainfodir")
+	cmd := exec.Command(c.CommandName, "getcainfo", "-H", cainfoDir)
+	MyLogger.Info(cmd.String())
+	var out bytes.Buffer
+	cmd.Stdout = &out
+	cmd.Path = c.CommandPath
+
+	if err := cmd.Run(); err != nil {
+		return "", err
+	}
+	return out.String(), nil
 }
 
-func (c *CaSdk) Enroll() error {
-	req := api.EnrollmentRequest{}
-	rsp, err := c.CaClient.Enroll(&req)
-	log.Info("%+v", rsp)
-	return err
+func (c *CaSdk) Enroll() (string, error) {
+	adminDir := Configer.GetString("caclient.admindir")
+	url := fmt.Sprintf("http://%s:%s@%s:%d", c.Admin, c.Adminpw, c.ServerAddr, c.ServerPort)
+	cmd := exec.Command(c.CommandName, "enroll", "-u", url, "-H", adminDir)
+	MyLogger.Info(cmd.String())
+	var out bytes.Buffer
+	cmd.Stdout = &out
+	cmd.Path = c.CommandPath
+
+	if err := cmd.Run(); err != nil {
+		return "", err
+	}
+	return out.String(), nil
 }
 
 func (c *CaSdk) Register() error {

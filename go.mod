@@ -11,7 +11,7 @@ exclude github.com/go-kit/kit v0.11.0
 require (
 	github.com/Knetic/govaluate v3.0.0+incompatible // indirect
 	github.com/VividCortex/gohistogram v1.0.0 // indirect
-	github.com/cloudflare/cfssl v0.0.0-20170916000929-7d88da830aad
+	github.com/cloudflare/cfssl v0.0.0-20170916000929-7d88da830aad // indirect
 	github.com/gin-gonic/gin v1.6.3
 	github.com/google/certificate-transparency-go v1.0.21 // indirect
 	github.com/gorilla/handlers v1.5.1 // indirect
@@ -33,6 +33,7 @@ require (
 	github.com/op/go-logging v0.0.0-20160315200505-970db520ece7 // indirect
 	github.com/sirupsen/logrus v1.2.0
 	github.com/spf13/cast v1.3.1 // indirect
+	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.7.0 // indirect
 	github.com/sykesm/zap-logfmt v0.0.4 // indirect

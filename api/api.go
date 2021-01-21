@@ -18,8 +18,13 @@ func NewApiController() *ApiController {
 	}
 }
 
-func (a *ApiController) Init() error {
-	return a.casdk.Init()
+func (a *ApiController) HandleHelp(ctx *gin.Context) {
+	help, err := a.casdk.Help()
+	if err != nil {
+		ctx.JSON(http.StatusOK, err.Error())
+		return
+	}
+	ctx.JSON(http.StatusOK, help)
 }
 
 func (a *ApiController) HandleCaInfo(ctx *gin.Context) {
@@ -33,10 +38,10 @@ func (a *ApiController) HandleCaInfo(ctx *gin.Context) {
 }
 
 func (a *ApiController) HandleEnroll(ctx *gin.Context) {
-	err := a.casdk.Enroll()
+	res, err := a.casdk.Enroll()
 	if err != nil {
 		ctx.JSON(http.StatusOK, err.Error())
 		return
 	}
-	ctx.JSON(http.StatusOK, "ok")
+	ctx.JSON(http.StatusOK, res)
 }
