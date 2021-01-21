@@ -8,6 +8,8 @@ import (
 	"os"
 	"os/exec"
 	"path"
+
+	"github.com/pkg/errors"
 )
 
 type CaSdk struct {
@@ -71,12 +73,13 @@ func (c *CaSdk) Enroll() (string, error) {
 	url := fmt.Sprintf("http://%s:%s@%s:%d", c.Admin, c.Adminpw, c.ServerAddr, c.ServerPort)
 	cmd := exec.Command(c.CommandName, "enroll", "-u", url, "-H", adminDir)
 	MyLogger.Info(cmd.String())
-	var out bytes.Buffer
+	var out, cmdErr bytes.Buffer
 	cmd.Stdout = &out
+	cmd.Stderr = &cmdErr
 	cmd.Path = c.CommandPath
 
 	if err := cmd.Run(); err != nil {
-		return "", err
+		return "", errors.WithMessage(err, cmdErr.String())
 	}
 	return out.String(), nil
 }
