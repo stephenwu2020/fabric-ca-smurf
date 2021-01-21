@@ -5,6 +5,7 @@ import (
 
 	. "fabric-ca-smurf/config"
 
+	"github.com/cloudflare/cfssl/log"
 	"github.com/hyperledger/fabric-ca/api"
 	"github.com/hyperledger/fabric-ca/lib"
 )
@@ -38,5 +39,12 @@ func (c *CaSdk) GetCAInfo() (*lib.GetCAInfoResponse, error) {
 }
 
 func (c *CaSdk) Enroll() error {
+	req := api.EnrollmentRequest{}
+	rsp, err := c.CaClient.Enroll(&req)
+	log.Info("%+v", rsp)
+	return err
+}
+
+func (c *CaSdk) Register() error {
 	return nil
 }
