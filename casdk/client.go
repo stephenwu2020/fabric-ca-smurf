@@ -16,8 +16,8 @@ type CaSdk struct {
 	ServerAddr  string
 	ServerPort  int
 	HomeDir     string
-	CommandName string
 	CommandPath string
+	CommandName string
 	Admin       string
 	Adminpw     string
 }
@@ -37,53 +37,52 @@ func NewCaSdk() *CaSdk {
 		ServerPort:  port,
 		HomeDir:     dir,
 		CommandPath: cliPath,
+		CommandName: "fabric-ca-client",
 		Admin:       admin,
 		Adminpw:     adminpw,
 	}
 }
 
 func (c *CaSdk) Help() (string, error) {
-	cmd := exec.Command(c.CommandName)
-	var out bytes.Buffer
-	cmd.Stdout = &out
-	cmd.Path = c.CommandPath
-
-	if err := cmd.Run(); err != nil {
-		return "", err
-	}
-	return out.String(), nil
+	return c.runCommand()
 }
 
 func (c *CaSdk) GetCAInfo() (string, error) {
 	cainfoDir := Configer.GetString("caclient.cainfodir")
-	cmd := exec.Command(c.CommandName, "getcainfo", "-H", cainfoDir)
-	MyLogger.Info(cmd.String())
-	var out bytes.Buffer
-	cmd.Stdout = &out
-	cmd.Path = c.CommandPath
-
-	if err := cmd.Run(); err != nil {
-		return "", err
+	args := []string{
+		"getcainfo",
+		"-H",
+		cainfoDir,
 	}
-	return out.String(), nil
+	return c.runCommand(args...)
 }
 
 func (c *CaSdk) Enroll() (string, error) {
 	adminDir := Configer.GetString("caclient.admindir")
 	url := fmt.Sprintf("http://%s:%s@%s:%d", c.Admin, c.Adminpw, c.ServerAddr, c.ServerPort)
-	cmd := exec.Command(c.CommandName, "enroll", "-u", url, "-H", adminDir)
-	MyLogger.Info(cmd.String())
-	var out, cmdErr bytes.Buffer
-	cmd.Stdout = &out
-	cmd.Stderr = &cmdErr
-	cmd.Path = c.CommandPath
-
-	if err := cmd.Run(); err != nil {
-		return "", errors.WithMessage(err, cmdErr.String())
+	args := []string{
+		"enroll",
+		"-u",
+		url,
+		"-H",
+		adminDir,
 	}
-	return out.String(), nil
+	return c.runCommand(args...)
 }
 
 func (c *CaSdk) Register() error {
 	return nil
+}
+
+func (c *CaSdk) runCommand(args ...string) (string, error) {
+	cmd := exec.Command("", args...)
+	cmd.Path = c.CommandPath
+	var cmdOut, cmdErr bytes.Buffer
+	cmd.Stderr = &cmdErr
+	cmd.Stdout = &cmdOut
+	MyLogger.Infof("Run command:%s", cmd.String())
+	if err := cmd.Run(); err != nil {
+		return "", errors.WithMessage(err, cmdErr.String())
+	}
+	return cmdOut.String(), nil
 }
