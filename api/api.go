@@ -18,6 +18,10 @@ func NewApiController() *ApiController {
 	}
 }
 
+func (a *ApiController) Init() error {
+	return a.casdk.Init()
+}
+
 func (a *ApiController) HandleCaInfo(ctx *gin.Context) {
 	cainfo, err := a.casdk.GetCAInfo()
 	if err != nil {

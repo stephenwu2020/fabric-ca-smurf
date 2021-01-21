@@ -33,6 +33,10 @@ func NewCaSdk() *CaSdk {
 	}
 }
 
+func (c *CaSdk) Init() error {
+	return c.CaClient.Init()
+}
+
 func (c *CaSdk) GetCAInfo() (*lib.GetCAInfoResponse, error) {
 	cainfo, err := c.CaClient.GetCAInfo(&api.GetCAInfoRequest{})
 	return cainfo, err
