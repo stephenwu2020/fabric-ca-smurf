@@ -75,8 +75,7 @@ func (c *CaSdk) Register() error {
 }
 
 func (c *CaSdk) runCommand(args ...string) (string, error) {
-	cmd := exec.Command("", args...)
-	cmd.Path = c.CommandPath
+	cmd := exec.Command(c.CommandPath, args...)
 	var cmdOut, cmdErr bytes.Buffer
 	cmd.Stderr = &cmdErr
 	cmd.Stdout = &cmdOut
